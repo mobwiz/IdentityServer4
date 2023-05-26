@@ -76,7 +76,7 @@ namespace IdentityServer.IntegrationTests.Clients
             payload.Should().Contain("client_id", "client");
             payload.Keys.Should().Contain("jti");
             payload.Keys.Should().Contain("iat");
-            
+
             payload["aud"].Should().Be("api");
 
             var scopes = payload["scope"] as JArray;
@@ -108,7 +108,7 @@ namespace IdentityServer.IntegrationTests.Clients
             payload.Keys.Should().Contain("jti");
             payload.Keys.Should().Contain("iat");
 
-            var audiences = ((JArray)payload["aud"]).Select(x => x.ToString());
+            var audiences = ((JArray) payload["aud"]).Select(x => x.ToString());
             audiences.Count().Should().Be(2);
             audiences.Should().Contain("api");
             audiences.Should().Contain("other_api");
@@ -148,6 +148,8 @@ namespace IdentityServer.IntegrationTests.Clients
             scopes.First().ToString().Should().Be("api1");
 
             var cnf = payload["cnf"] as JObject;
+
+            // cnf is not valid ?????
             cnf["x5t#S256"].ToString().Should().Be("foo");
         }
 
@@ -175,7 +177,7 @@ namespace IdentityServer.IntegrationTests.Clients
             payload.Should().Contain("client_id", "client");
             payload.Keys.Should().Contain("jti");
             payload.Keys.Should().Contain("iat");
-            
+
             payload["aud"].Should().Be("api");
 
             var scopes = payload["scope"] as JArray;
@@ -208,12 +210,12 @@ namespace IdentityServer.IntegrationTests.Clients
             payload.Keys.Should().Contain("jti");
             payload.Keys.Should().Contain("iat");
 
-            var audiences = ((JArray)payload["aud"]).Select(x => x.ToString());
+            var audiences = ((JArray) payload["aud"]).Select(x => x.ToString());
             audiences.Count().Should().Be(2);
             audiences.Should().Contain("api");
             audiences.Should().Contain("other_api");
 
-            var scopes = ((JArray)payload["scope"]).Select(x => x.ToString());
+            var scopes = ((JArray) payload["scope"]).Select(x => x.ToString());
             scopes.Count().Should().Be(3);
             scopes.Should().Contain("api1");
             scopes.Should().Contain("api2");
@@ -286,7 +288,7 @@ namespace IdentityServer.IntegrationTests.Clients
             response.RefreshToken.Should().BeNull();
 
             var payload = GetPayload(response);
-            
+
             payload.Should().Contain("iss", "https://idsvr4");
             payload.Should().Contain("client_id", "client.no_secret");
 

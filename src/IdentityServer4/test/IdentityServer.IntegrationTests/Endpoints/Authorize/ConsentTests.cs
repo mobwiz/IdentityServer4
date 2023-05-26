@@ -5,9 +5,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using FluentAssertions;
+using IdentityModel.Client;
 using IdentityServer.IntegrationTests.Common;
 using IdentityServer4.Models;
 using IdentityServer4.Stores;
@@ -117,7 +119,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
         }
 
         [Theory]
-        [InlineData((Type)null)]
+        [InlineData((Type) null)]
         [InlineData(typeof(QueryStringAuthorizationParametersMessageStore))]
         [InlineData(typeof(DistributedCacheAuthorizationParametersMessageStore))]
         [Trait("Category", Category)]
@@ -134,6 +136,13 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
 
             await _mockPipeline.LoginAsync("bob");
 
+            var param1 = new Parameters
+            {
+                { "display", "popup" },
+                { "ui_locales", "ui_locale_value" },
+                { "custom_foo", "foo_value" }
+            };
+
             var url = _mockPipeline.CreateAuthorizeUrl(
                 clientId: "client2",
                 responseType: "id_token token",
@@ -142,12 +151,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
                 state: "123_state",
                 nonce: "123_nonce",
                 acrValues: "acr_1 acr_2 tenant:tenant_value",
-                extra: new
-                {
-                    display = "popup", // must use a valid value form the spec for display
-                    ui_locales = "ui_locale_value",
-                    custom_foo = "foo_value"
-                }
+                extra: param1
             );
             var response = await _mockPipeline.BrowserClient.GetAsync(url);
 
@@ -163,7 +167,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Authorize
         }
 
         [Theory]
-        [InlineData((Type)null)]
+        [InlineData((Type) null)]
         [InlineData(typeof(QueryStringAuthorizationParametersMessageStore))]
         [InlineData(typeof(DistributedCacheAuthorizationParametersMessageStore))]
         [Trait("Category", Category)]

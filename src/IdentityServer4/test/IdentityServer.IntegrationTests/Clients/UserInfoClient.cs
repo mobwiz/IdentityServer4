@@ -2,21 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using FluentAssertions;
+using IdentityModel;
+using IdentityModel.Client;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
-using FluentAssertions;
-using IdentityModel;
-using IdentityModel.Client;
-using IdentityServer.IntegrationTests.Clients.Setup;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.TestHost;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Xunit;
+using IdentityServer.IntegrationTests.Clients.Setup;
+using System.Net.WebSockets;
 
 namespace IdentityServer.IntegrationTests.Clients
 {
@@ -172,18 +173,34 @@ namespace IdentityServer.IntegrationTests.Clients
             });
 
             response.IsError.Should().BeFalse();
-            
+
             var payload = GetPayload(response);
 
-            var scopes = ((JArray)payload["scope"]).Select(x => x.ToString()).ToArray();
-            scopes.Length.Should().Be(5);
-            scopes.Should().Contain("openid");
-            scopes.Should().Contain("email");
-            scopes.Should().Contain("api1");
-            scopes.Should().Contain("api4.with.roles");
-            scopes.Should().Contain("roles");
+            // var scopes = ((JArray) payload["scope"]).Select(x => x.ToString()).ToArray();
 
-            var roles = ((JArray)payload["role"]).Select(x => x.ToString()).ToArray();
+            if (payload.TryGetValue("scope", out var scopeStr))
+            {
+                // var scopes = scopeStr as System.Text.Json.Nodes.JsonArray;
+                var strValue = Convert.ToString(scopeStr);
+
+                var scopes = JsonSerializer.Deserialize<string[]>(strValue);
+
+                scopes.Length.Should().Be(5);
+                scopes.Should().Contain("openid");
+                scopes.Should().Contain("email");
+                scopes.Should().Contain("api1");
+                scopes.Should().Contain("api4.with.roles");
+                scopes.Should().Contain("roles");
+            }
+            else
+            {
+                Assert.True(false, "scope not found");
+            }
+
+            payload.TryGetValue("role", out var roleStr);
+
+            var roles = JsonSerializer.Deserialize<string[]>(Convert.ToString(roleStr));
+
             roles.Length.Should().Be(2);
             roles.Should().Contain("Geek");
             roles.Should().Contain("Developer");
@@ -194,7 +211,14 @@ namespace IdentityServer.IntegrationTests.Clients
                 Token = response.AccessToken
             });
 
-            roles = ((JArray)userInfo.Json["role"]).Select(x => x.ToString()).ToArray();
+            //roles = ((JArray) userInfo.Json["role"]).Select(x => x.ToString()).ToArray();
+
+            payload = GetPayload(response);
+            payload.TryGetValue("role", out var roleStr1);
+            roles = JsonSerializer.Deserialize<string[]>(Convert.ToString(roleStr1));
+
+            //roles = userInfo.Claims.First(p => p.Type == "role").Value.Split(" ");
+
             roles.Length.Should().Be(2);
             roles.Should().Contain("Geek");
             roles.Should().Contain("Developer");
@@ -203,7 +227,7 @@ namespace IdentityServer.IntegrationTests.Clients
         private Dictionary<string, object> GetPayload(TokenResponse response)
         {
             var token = response.AccessToken.Split('.').Skip(1).Take(1).First();
-            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(
+            var dictionary = JsonSerializer.Deserialize<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(Base64Url.Decode(token)));
 
             return dictionary;

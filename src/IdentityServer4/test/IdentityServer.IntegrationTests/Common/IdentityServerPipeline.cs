@@ -78,7 +78,7 @@ namespace IdentityServer.IntegrationTests.Common
         {
             var builder = new WebHostBuilder();
             builder.ConfigureServices(ConfigureServices);
-            builder.Configure(app=>
+            builder.Configure(app =>
             {
                 if (basePath != null)
                 {
@@ -100,7 +100,7 @@ namespace IdentityServer.IntegrationTests.Common
 
             Server = new TestServer(builder);
             Handler = Server.CreateHandler();
-            
+
             BrowserClient = new BrowserClient(new BrowserHandler(Handler));
             BackChannelClient = new HttpClient(Handler);
         }
@@ -318,7 +318,7 @@ namespace IdentityServer.IntegrationTests.Common
             string responseMode = null,
             string codeChallenge = null,
             string codeChallengeMethod = null,
-            object extra = null)
+            Parameters extra = null)
         {
             var url = new RequestUrl(AuthorizeEndpoint).CreateAuthorizeUrl(
                 clientId: clientId,
@@ -353,7 +353,7 @@ namespace IdentityServer.IntegrationTests.Common
             string responseMode = null,
             string codeChallenge = null,
             string codeChallengeMethod = null,
-            object extra = null)
+            Parameters extra = null)
         {
             var old = BrowserClient.AllowAutoRedirect;
             BrowserClient.AllowAutoRedirect = false;
@@ -396,7 +396,7 @@ namespace IdentityServer.IntegrationTests.Common
         }
     }
 
-    public class MockExternalAuthenticationHandler : 
+    public class MockExternalAuthenticationHandler :
         IAuthenticationHandler,
         IAuthenticationSignInHandler,
         IAuthenticationRequestHandler
@@ -404,7 +404,7 @@ namespace IdentityServer.IntegrationTests.Common
         private readonly IHttpContextAccessor _httpContextAccessor;
         private HttpContext HttpContext => _httpContextAccessor.HttpContext;
 
-        public Func<HttpContext, Task<bool>> OnFederatedSignout = 
+        public Func<HttpContext, Task<bool>> OnFederatedSignout =
             async context =>
             {
                 await context.SignOutAsync();

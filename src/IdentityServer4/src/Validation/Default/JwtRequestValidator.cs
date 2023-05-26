@@ -26,7 +26,7 @@ namespace IdentityServer4.Validation
     {
         private readonly string _audienceUri;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        
+
         /// <summary>
         /// JWT handler
         /// </summary>
@@ -55,7 +55,7 @@ namespace IdentityServer4.Validation
         /// The logger
         /// </summary>
         protected readonly ILogger Logger;
-        
+
         /// <summary>
         /// The optione
         /// </summary>
@@ -67,7 +67,7 @@ namespace IdentityServer4.Validation
         public JwtRequestValidator(IHttpContextAccessor contextAccessor, IdentityServerOptions options, ILogger<JwtRequestValidator> logger)
         {
             _httpContextAccessor = contextAccessor;
-            
+
             Options = options;
             Logger = logger;
         }
@@ -177,12 +177,17 @@ namespace IdentityServer4.Validation
 
             if (Options.StrictJarValidation)
             {
-                tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
+                // tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
+                //tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
+
+                throw new NotImplementedException();
+
+                //tokenValidationParameters.
             }
 
             Handler.ValidateToken(jwtTokenString, tokenValidationParameters, out var token);
-            
-            return Task.FromResult((JwtSecurityToken)token);
+
+            return Task.FromResult((JwtSecurityToken) token);
         }
 
         /// <summary>
