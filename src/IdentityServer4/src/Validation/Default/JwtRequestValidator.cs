@@ -2,11 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4.Configuration;
 using IdentityServer4.Extensions;
@@ -14,8 +9,12 @@ using IdentityServer4.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace IdentityServer4.Validation
 {
@@ -177,12 +176,7 @@ namespace IdentityServer4.Validation
 
             if (Options.StrictJarValidation)
             {
-                // tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
-                //tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
-
-                throw new NotImplementedException();
-
-                //tokenValidationParameters.
+                tokenValidationParameters.ValidTypes = new[] { JwtClaimTypes.JwtTypes.AuthorizationRequest };
             }
 
             Handler.ValidateToken(jwtTokenString, tokenValidationParameters, out var token);
@@ -199,8 +193,13 @@ namespace IdentityServer4.Validation
         {
             // filter JWT validation values
             var payload = new Dictionary<string, string>();
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                WriteIndented = false,
+            };
             foreach (var key in token.Payload.Keys)
             {
+
                 if (!Constants.Filters.JwtRequestClaimTypesFilter.Contains(key))
                 {
                     var value = token.Payload[key];
@@ -210,11 +209,21 @@ namespace IdentityServer4.Validation
                         case string s:
                             payload.Add(key, s);
                             break;
-                        case JObject jobj:
-                            payload.Add(key, jobj.ToString(Formatting.None));
-                            break;
-                        case JArray jarr:
-                            payload.Add(key, jarr.ToString(Formatting.None));
+                        //case JObject jobj:
+                        //    payload.Add(key, jobj.ToString(Formatting.None));
+                        //    break;
+                        case object obj:
+                            var objStr = obj.ToString();
+                            try
+                            {
+                                JsonElement json = JsonSerializer.Deserialize<JsonElement>(objStr, options: jsonSerializerOptions);
+                                payload.Add(key, JsonSerializer.Serialize(json, options: jsonSerializerOptions));
+                            }
+                            catch
+                            {
+                                payload.Add(key, objStr);
+                            }
+
                             break;
                     }
                 }
