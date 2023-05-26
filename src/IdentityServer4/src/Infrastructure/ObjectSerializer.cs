@@ -10,7 +10,7 @@ namespace IdentityServer4
     {
         private static readonly JsonSerializerOptions Options = new JsonSerializerOptions
         {
-            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault
         };
         
         public static string ToString(object o)
