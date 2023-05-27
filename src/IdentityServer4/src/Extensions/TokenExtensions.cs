@@ -13,6 +13,7 @@ using System.Linq;
 using System.Security.Claims;
 using IdentityServer4.Configuration;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace IdentityServer4.Extensions
 {
@@ -47,17 +48,21 @@ namespace IdentityServer4.Extensions
 
             var amrClaims = token.Claims.Where(x => x.Type == JwtClaimTypes.AuthenticationMethod).ToArray();
             var scopeClaims = token.Claims.Where(x => x.Type == JwtClaimTypes.Scope).ToArray();
-            var jsonClaims = token.Claims.Where(x => x.ValueType == IdentityServerConstants.ClaimValueTypes.Json).ToList();
+            // var jsonClaims = token.Claims.Where(x => x.ValueType == IdentityServerConstants.ClaimValueTypes.Json).ToList();
 
             // add confirmation claim if present (it's JSON valued)
             if (token.Confirmation.IsPresent())
             {
-                jsonClaims.Add(new Claim(JwtClaimTypes.Confirmation, token.Confirmation, IdentityServerConstants.ClaimValueTypes.Json));
+                //jsonClaims.Add(new Claim(JwtClaimTypes.Confirmation, token.Confirmation, IdentityServerConstants.ClaimValueTypes.Json));
+                //new Claim("someObj", someObjJson, Microsoft.IdentityModel.JsonWebTokens.JsonClaimValueTypes.Json),
+                //new Claim("someArr", someArrJson, Microsoft.IdentityModel.JsonWebTokens.JsonClaimValueTypes.JsonArray),
+
+                payload.AddClaim(new Claim(JwtClaimTypes.Confirmation, token.Confirmation, Microsoft.IdentityModel.JsonWebTokens.JsonClaimValueTypes.Json));
             }
 
             var normalClaims = token.Claims
                 .Except(amrClaims)
-                .Except(jsonClaims)
+                //.Except(jsonClaims)
                 .Except(scopeClaims);
 
             payload.AddClaims(normalClaims);
@@ -84,70 +89,7 @@ namespace IdentityServer4.Extensions
                 payload.Add(JwtClaimTypes.AuthenticationMethod, amrValues);
             }
 
-            // deal with json types
-            // calling ToArray() to trigger JSON parsing once and so later 
-            // collection identity comparisons work for the anonymous type
-            try
-            {
-                var jsonTokens = jsonClaims.Select(x => new { x.Type, JsonValue = JsonDocument.Parse(x.Value).RootElement }).ToArray();
-
-                var jsonObjects = jsonTokens.Where(x => x.JsonValue.ValueKind == JsonValueKind.Object).ToArray();
-                var jsonObjectGroups = jsonObjects.GroupBy(x => x.Type).ToArray();
-                foreach (var group in jsonObjectGroups)
-                {
-                    if (payload.ContainsKey(group.Key))
-                    {
-                        throw new Exception($"Can't add two claims where one is a JSON object and the other is not a JSON object ({group.Key})");
-                    }
-
-                    if (group.Skip(1).Any())
-                    {
-                        // add as array
-                        payload.Add(group.Key, group.Select(x => x.JsonValue).ToArray());
-                    }
-                    else
-                    {
-                        // add just one
-                        payload.Add(group.Key, group.First().JsonValue);
-                    }
-                }
-
-                var jsonArrays = jsonTokens.Where(x => x.JsonValue.ValueKind == JsonValueKind.Array).ToArray();
-                var jsonArrayGroups = jsonArrays.GroupBy(x => x.Type).ToArray();
-                foreach (var group in jsonArrayGroups)
-                {
-                    if (payload.ContainsKey(group.Key))
-                    {
-                        throw new Exception(
-                            $"Can't add two claims where one is a JSON array and the other is not a JSON array ({group.Key})");
-                    }
-
-                    var newArr = new List<object>();
-                    foreach (var arrays in group)
-                    {
-                        var arr = arrays.JsonValue.Deserialize<object[]>();
-                        newArr.AddRange(arr);
-                    }
-
-                    // add just one array for the group/key/claim type
-                    payload.Add(group.Key, newArr.ToArray());
-                }
-
-                var unsupportedJsonTokens = jsonTokens.Except(jsonObjects).Except(jsonArrays).ToArray();
-                var unsupportedJsonClaimTypes = unsupportedJsonTokens.Select(x => x.Type).Distinct().ToArray();
-                if (unsupportedJsonClaimTypes.Any())
-                {
-                    throw new Exception(
-                        $"Unsupported JSON type for claim types: {unsupportedJsonClaimTypes.Aggregate((x, y) => x + ", " + y)}");
-                }
-
-                return payload;
-            }
-            catch (Exception ex)
-            {
-                logger.LogCritical(ex, "Error creating a JSON valued claim");
-                throw;
-            }
+            return payload;
         }
     }
 }

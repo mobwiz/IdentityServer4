@@ -1,4 +1,4 @@
-﻿// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
+// Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
@@ -8,6 +8,8 @@ using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using System.Text.Json.Nodes;
+using System.Text.Json;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -48,6 +50,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // provide default in-memory implementation, not suitable for most production scenarios
             builder.AddInMemoryPersistedGrants();
+
+            ////var baseFunction = System.IdentityModel.Tokens.Jwt.JsonExtensions.Serializer;
+            ////// allow for text.json to serialize the json nodes.
+            //System.IdentityModel.Tokens.Jwt.JsonExtensions.Serializer = (object obj) =>
+            //{
+            //   return JsonSerializer.Serialize(obj, options: new JsonSerializerOptions
+            //    {
+            //        WriteIndented = false,
+            //        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            //    });
+            //};
 
             return builder;
         }

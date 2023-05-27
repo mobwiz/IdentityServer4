@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <FrameworkVersion>6.0.*</FrameworkVersion>
+    <FrameworkVersion>6.0.0</FrameworkVersion>
     <ExtensionsVersion>6.0.*</ExtensionsVersion>
     
     <IdentityServerVersion>4.1.2-*</IdentityServerVersion>
@@ -35,18 +35,16 @@
     <PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(ExtensionsVersion)" />
     
     <!--misc -->
-    <PackageReference Update="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Update="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="6.0.16" />
-    <PackageReference Update="System.IdentityModel.Tokens.Jwt" Version="[5.6.0,6.0)" />
+    <PackageReference Update="System.IdentityModel.Tokens.Jwt" Version="[6.30.1)" />
     <PackageReference Update="System.Security.Principal.Windows" Version="4.7.0" />
     <PackageReference Update="AutoMapper" Version="[10.0.0,11.0)" />
     
     <!--microsoft asp.net core -->
-    <PackageReference Update="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="$(FrameworkVersion)" />
+    <PackageReference Update="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.16" />
     <PackageReference Update="Microsoft.AspNetCore.TestHost" Version="$(FrameworkVersion)" />
     <PackageReference Update="Microsoft.AspNetCore.Identity" Version="$(FrameworkVersion)" />
     <PackageReference Update="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="$(FrameworkVersion)" />
-    <PackageReference Update="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="$(FrameworkVersion)" />
     <PackageReference Update="Microsoft.AspNetCore.Authentication.Certificate" Version="$(FrameworkVersion)"/>
     
 

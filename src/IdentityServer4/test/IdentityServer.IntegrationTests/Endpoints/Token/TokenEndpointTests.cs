@@ -88,7 +88,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Token
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonDocument.Parse(json); // JObject.Parse(json);
+            using var result = JsonDocument.Parse(json); // JObject.Parse(json);
             result.RootElement.TryGetProperty("error", out var errObj).Should().BeFalse();
         }
 
@@ -111,7 +111,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Token
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             var json = await response.Content.ReadAsStringAsync();
-            var result = JsonDocument.Parse(json);
+            using var result = JsonDocument.Parse(json);
             result.RootElement.TryGetProperty("error", out var err).Should().BeFalse();
         }
     }
