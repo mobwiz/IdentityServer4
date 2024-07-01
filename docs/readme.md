@@ -1,3 +1,7 @@
+# Change Log
+* upgrade to net core 6.0
+
+
 # IdentityServer4 documentation
 
 The folder contains the documentation for identityserver4.
