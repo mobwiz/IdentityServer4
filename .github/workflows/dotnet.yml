@@ -21,8 +21,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore src/IdentityServer4/src/IdentityServer4.csproj
+      run: dotnet restore ./src/IdentityServer4/src/IdentityServer4.csproj
     - name: Build
-      run: dotnet build --no-restore src/IdentityServer4/src/IdentityServer4.csproj
+      run: dotnet build --no-restore ./src/IdentityServer4/src/IdentityServer4.csproj
     - name: Test
-      run: dotnet test --no-build --verbosity normal src/IdentityServer4
+      run: dotnet test --no-build --verbosity normal ./src/IdentityServer4
