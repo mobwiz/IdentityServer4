@@ -12,6 +12,8 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using static IdentityServer4.IdentityServerConstants;
 
@@ -58,7 +60,7 @@ namespace IdentityServer4.Services
             Clock = clock;
             Keys = keys;
             Options = options;
-            Logger = logger;
+            Logger = logger;            
         }
 
         /// <summary>
@@ -134,7 +136,11 @@ namespace IdentityServer4.Services
         protected virtual Task<string> CreateJwtAsync(JwtSecurityToken jwt)
         {
             var handler = new JwtSecurityTokenHandler();
-            return Task.FromResult(handler.WriteToken(jwt));
+
+
+            var retValue = handler.WriteToken(jwt);
+
+            return Task.FromResult(retValue);
         }
     }
 }

@@ -1,8 +1,7 @@
 // Copyright (c) Brock Allen & Dominick Baier. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace IdentityServer4.Stores.Serialization
 {
@@ -12,13 +11,13 @@ namespace IdentityServer4.Stores.Serialization
     /// <seealso cref="IdentityServer4.Stores.Serialization.IPersistentGrantSerializer" />
     public class PersistentGrantSerializer : IPersistentGrantSerializer
     {
-        private static readonly JsonSerializerSettings _settings;
+        private static readonly JsonSerializerOptions _settings;
 
         static PersistentGrantSerializer()
         {
-            _settings = new JsonSerializerSettings
+            _settings = new JsonSerializerOptions
             {
-                ContractResolver = new CustomContractResolver()
+                // ContractResolver = new CustomContractResolver()                
             };
             _settings.Converters.Add(new ClaimConverter());
             _settings.Converters.Add(new ClaimsPrincipalConverter());
@@ -32,7 +31,7 @@ namespace IdentityServer4.Stores.Serialization
         /// <returns></returns>
         public string Serialize<T>(T value)
         {
-            return JsonConvert.SerializeObject(value, _settings);
+            return JsonSerializer.Serialize(value, options: _settings);
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace IdentityServer4.Stores.Serialization
         /// <returns></returns>
         public T Deserialize<T>(string json)
         {
-            return JsonConvert.DeserializeObject<T>(json, _settings);
+            return JsonSerializer.Deserialize<T>(json, options: _settings);
         }
     }
 }
