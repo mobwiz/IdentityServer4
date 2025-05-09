@@ -3,10 +3,12 @@
 
 
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -23,21 +25,14 @@ namespace IdentityServer4.Extensions
                 return string.Empty;
             }
 
-            var sb = new StringBuilder(100);
-
-            foreach (var element in list)
-            {
-                sb.Append(element + " ");
-            }
-
-            return sb.ToString().Trim();
+            return string.Join(' ', list);
         }
 
         [DebuggerStepThrough]
         public static IEnumerable<string> FromSpaceSeparatedString(this string input)
         {
             input = input.Trim();
-            return input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            return input.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public static List<string> ParseScopesString(this string scopes)
@@ -48,19 +43,18 @@ namespace IdentityServer4.Extensions
             }
 
             scopes = scopes.Trim();
-            var parsedScopes = scopes.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToList();
-
-            if (parsedScopes.Any())
+            List<string> list = scopes.Split(new char[1] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Distinct().ToList();
+            if (list.Any())
             {
-                parsedScopes.Sort();
-                return parsedScopes;
+                list.Sort();
+                return list;
             }
 
             return null;
         }
 
         [DebuggerStepThrough]
-        public static bool IsMissing(this string value)
+        public static bool IsMissing([NotNullWhen(false)] this string value)
         {
             return string.IsNullOrWhiteSpace(value);
         }
@@ -72,6 +66,7 @@ namespace IdentityServer4.Extensions
             {
                 return true;
             }
+
             if (value.Length > maxLength)
             {
                 return true;
@@ -81,7 +76,7 @@ namespace IdentityServer4.Extensions
         }
 
         [DebuggerStepThrough]
-        public static bool IsPresent(this string value)
+        public static bool IsPresent([NotNullWhen(true)] this string value)
         {
             return !string.IsNullOrWhiteSpace(value);
         }
@@ -133,7 +128,10 @@ namespace IdentityServer4.Extensions
         [DebuggerStepThrough]
         public static string CleanUrlPath(this string url)
         {
-            if (String.IsNullOrWhiteSpace(url)) url = "/";
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                url = "/";
+            }
 
             if (url != "/" && url.EndsWith("/"))
             {
@@ -151,43 +149,65 @@ namespace IdentityServer4.Extensions
                 return false;
             }
 
-            // Allows "/" or "/foo" but not "//" or "/\".
             if (url[0] == '/')
             {
-                // url is exactly "/"
                 if (url.Length == 1)
                 {
                     return true;
                 }
 
-                // url doesn't start with "//" or "/\"
                 if (url[1] != '/' && url[1] != '\\')
                 {
-                    return true;
+                    return !HasControlCharacter(url.AsSpan(1));
                 }
 
                 return false;
             }
 
-            // Allows "~/" or "~/foo" but not "~//" or "~/\".
             if (url[0] == '~' && url.Length > 1 && url[1] == '/')
             {
-                // url is exactly "~/"
                 if (url.Length == 2)
                 {
                     return true;
                 }
 
-                // url doesn't start with "~//" or "~/\"
                 if (url[2] != '/' && url[2] != '\\')
                 {
-                    return true;
+                    return !HasControlCharacter(url.AsSpan(2));
                 }
 
                 return false;
             }
 
             return false;
+            static bool HasControlCharacter(ReadOnlySpan<char> readOnlySpan)
+            {
+                for (int i = 0; i < readOnlySpan.Length; i++)
+                {
+                    if (char.IsControl(readOnlySpan[i]))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        [DebuggerStepThrough]
+        public static bool IsUri(this string input)
+        {
+            if (!Uri.TryCreate(input, UriKind.Absolute, out Uri result))
+            {
+                return false;
+            }
+
+            if (result.IsFile && !input.StartsWith(Uri.UriSchemeFile + "://", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         [DebuggerStepThrough]
@@ -227,19 +247,20 @@ namespace IdentityServer4.Extensions
         {
             if (url != null)
             {
-                var idx = url.IndexOf('?');
-                if (idx >= 0)
+                int num = url.IndexOf('?');
+                if (num >= 0)
                 {
-                    url = url.Substring(idx + 1);
+                    url = url.Substring(num + 1);
                 }
-                var query = QueryHelpers.ParseNullableQuery(url);
-                if (query != null)
+
+                Dictionary<string, StringValues> dictionary = QueryHelpers.ParseNullableQuery(url);
+                if (dictionary != null)
                 {
-                    return query.AsNameValueCollection();
+                    return dictionary.AsNameValueCollection();
                 }
             }
 
-            return new NameValueCollection();           
+            return new NameValueCollection();
         }
 
         public static string GetOrigin(this string url)
@@ -256,24 +277,21 @@ namespace IdentityServer4.Extensions
                     return null;
                 }
 
-                if (uri.Scheme == "http" || uri.Scheme == "https")
-                {
-                    return $"{uri.Scheme}://{uri.Authority}";
-                }
+                return uri.Scheme + "://" + uri.Authority;
             }
 
             return null;
         }
-        
+
         public static string Obfuscate(this string value)
         {
-            var last4Chars = "****";
+            string text = "****";
             if (value.IsPresent() && value.Length > 4)
             {
-                last4Chars = value.Substring(value.Length - 4);
+                text = value.Substring(value.Length - 4);
             }
 
-            return "****" + last4Chars;
+            return "****" + text;
         }
     }
 }
