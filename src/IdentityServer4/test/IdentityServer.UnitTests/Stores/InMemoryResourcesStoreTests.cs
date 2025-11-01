@@ -38,7 +38,7 @@ namespace IdentityServer.UnitTests.Stores
 
             act = () => new InMemoryResourcesStore(null, apiResources, null);
             act.Should().Throw<ArgumentException>();
-            
+
             act = () => new InMemoryResourcesStore(null, null, scopes);
             act.Should().Throw<ArgumentException>();
         }
