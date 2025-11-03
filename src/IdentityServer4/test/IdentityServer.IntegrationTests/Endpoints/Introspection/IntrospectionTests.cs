@@ -181,7 +181,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Introspection
                 Token = tokenResponse.AccessToken
             });
 
-            var values = introspectionResponse.Json.Deserialize<Dictionary<string, object>>();
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(introspectionResponse.Json.Value.GetRawText());
 
             ((JsonElement) values["aud"]).ValueKind.Should().Be(JsonValueKind.String);
             ((JsonElement) values["iss"]).ValueKind.Should().Be(JsonValueKind.String);
@@ -220,7 +220,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Introspection
                 Token = tokenResponse.AccessToken
             });
 
-            var values = introspectionResponse.Json.Deserialize<Dictionary<string, object>>();
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(introspectionResponse.Json.Value.GetRawText());
 
             ((JsonElement) values["aud"]).ValueKind.Should().Be(JsonValueKind.String);
             ((JsonElement) values["iss"]).ValueKind.Should().Be(JsonValueKind.String);
@@ -259,7 +259,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Introspection
                 Token = tokenResponse.AccessToken
             });
 
-            var values = introspectionResponse.Json.Deserialize<Dictionary<string, object>>();
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(introspectionResponse.Json.Value.GetRawText());
 
 
             values["aud"].GetType().Name.Should().Be("JsonElement");
@@ -309,7 +309,7 @@ namespace IdentityServer.IntegrationTests.Endpoints.Introspection
                 Token = tokenResponse.AccessToken
             });
 
-            var values = introspectionResponse.Json.Deserialize<Dictionary<string, object>>();
+            var values = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(introspectionResponse.Json.Value.GetRawText());
 
             ((JsonElement) values["aud"]).ValueKind.Should().Be(JsonValueKind.String);
             ((JsonElement) values["iss"]).ValueKind.Should().Be(JsonValueKind.String);
