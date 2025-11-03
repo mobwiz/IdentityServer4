@@ -54,10 +54,18 @@ namespace IdentityServer4.Models
             {
                 collection.Add("state", response.State);
             }
-            
+
             if (response.SessionState.IsPresent())
             {
                 collection.Add("session_state", response.SessionState);
+            }
+            
+            if (response.ExtendProperties.Count > 0)
+            {
+                foreach (var item in response.ExtendProperties.AllKeys)
+                {
+                    collection.Add(item, response.ExtendProperties[item]);
+                }
             }
 
             return collection;

@@ -5,11 +5,12 @@
     <ExtensionsVersion>8.0.*</ExtensionsVersion>
 
     <IdentityServerVersion>4.1.2-*</IdentityServerVersion>
+    <Version>8.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <!--build related-->
-    <PackageReference Include="MinVer" Version="2.3.0" PrivateAssets="All" />
+    <!-- <PackageReference Include="MinVer" Version="2.3.0" PrivateAssets="All" /> -->
     <PackageReference Update="SimpleExec" Version="6.2.0" />
     <PackageReference Update="Bullseye" Version="3.3.0" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />

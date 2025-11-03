@@ -121,3 +121,4 @@ Key flows demonstrated: Client Credentials, Hybrid, Implicit, Authorization Code
 ## Migration Status
 
 Currently upgrading from .NET 6.0 to .NET 8.0 on the `feature/dotnet-8` branch. Main development targets are in `src/IdentityServer4/src/IdentityServer4.csproj` and related build files.
+- Use System.Text.Json instead of Newtonsoft.Json

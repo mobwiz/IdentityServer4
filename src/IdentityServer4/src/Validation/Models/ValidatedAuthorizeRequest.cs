@@ -204,5 +204,10 @@ namespace IdentityServer4.Validation
             RequestedScopes = new List<string>();
             AuthenticationContextReferenceClasses = new List<string>();
         }
+
+        /// <summary>
+        /// Get or set the request host..
+        /// </summary>
+        public string RequestHost { get; set; }
     }
 }
