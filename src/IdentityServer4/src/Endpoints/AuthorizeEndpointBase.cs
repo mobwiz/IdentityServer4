@@ -79,6 +79,13 @@ namespace IdentityServer4.Endpoints
             }
 
             var request = result.ValidatedRequest;
+            
+            // add a request host to the validate requset...
+            if(context != null)
+            {
+                request.RequestHost = $"{context.Request.Scheme}://{context.Request.Host}";
+            }
+
             LogRequest(request);
 
             // determine user interaction

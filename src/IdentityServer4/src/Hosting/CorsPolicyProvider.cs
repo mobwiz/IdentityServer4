@@ -83,6 +83,7 @@ namespace IdentityServer4.Hosting
         {
             var policyBuilder = new CorsPolicyBuilder()
                 .WithOrigins(origin)
+                .AllowCredentials()
                 .AllowAnyHeader()
                 .AllowAnyMethod();
 

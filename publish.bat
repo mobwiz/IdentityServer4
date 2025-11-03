@@ -1,2 +1,2 @@
-dotnet nuget push .\nuget\IdentityServer4.8.0.0.nupkg -k 702434ac-b407-33e7-9552-b2b516f0b05e -s https://nexus.wul.ai/repository/nuget-hosted-uibot/
-dotnet nuget push .\nuget\IdentityServer4.Storage.8.0.0.nupkg -k 702434ac-b407-33e7-9552-b2b516f0b05e -s https://nexus.wul.ai/repository/nuget-hosted-uibot/
+dotnet nuget push .\nuget\IdentityServer4.8.0.2.nupkg -k 702434ac-b407-33e7-9552-b2b516f0b05e -s https://nexus.wul.ai/repository/nuget-hosted-uibot/
+dotnet nuget push .\nuget\IdentityServer4.Storage.8.0.2.nupkg -k 702434ac-b407-33e7-9552-b2b516f0b05e -s https://nexus.wul.ai/repository/nuget-hosted-uibot/
