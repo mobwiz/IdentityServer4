@@ -56,7 +56,7 @@ namespace IdentityServer4.Endpoints
 
         public abstract Task<IEndpointResult> ProcessAsync(HttpContext context);
 
-        internal async Task<IEndpointResult> ProcessAuthorizeRequestAsync(NameValueCollection parameters, ClaimsPrincipal user, ConsentResponse consent)
+        internal async Task<IEndpointResult> ProcessAuthorizeRequestAsync(NameValueCollection parameters, ClaimsPrincipal user, ConsentResponse consent, HttpContext context)
         {
             if (user != null)
             {
@@ -79,6 +79,13 @@ namespace IdentityServer4.Endpoints
             }
 
             var request = result.ValidatedRequest;
+            
+            // add a request host to the validate requset...
+            if(context != null)
+            {
+                request.RequestHost = $"{context.Request.Scheme}://{context.Request.Host}";
+            }
+
             LogRequest(request);
 
             // determine user interaction

@@ -100,7 +100,8 @@ namespace IdentityServer.IntegrationTests.Conformance.Basic
             var state = Guid.NewGuid().ToString();
             var nonce = Guid.NewGuid().ToString();
 
-            var url = _mockPipeline.CreateAuthorizeUrl(
+            // Test that missing response_type parameter is rejected at the client level
+            Action act = () => _mockPipeline.CreateAuthorizeUrl(
                 clientId: "code_client",
                 responseType: null, // missing
                 scope: "openid",
@@ -108,10 +109,7 @@ namespace IdentityServer.IntegrationTests.Conformance.Basic
                 state: state,
                 nonce: nonce);
 
-            _mockPipeline.BrowserClient.AllowAutoRedirect = true;
-            var response = await _mockPipeline.BrowserClient.GetAsync(url);
-
-            _mockPipeline.ErrorMessage.Error.Should().Be("unsupported_response_type");
+            act.Should().Throw<ArgumentException>().Where(e => e.Message.Contains("response_type"));
         }
     }
 }

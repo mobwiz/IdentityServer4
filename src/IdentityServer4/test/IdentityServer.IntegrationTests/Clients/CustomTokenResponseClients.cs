@@ -299,12 +299,12 @@ namespace IdentityServer.IntegrationTests.Clients
 
         private CustomResponseDto GetDto(JsonElement responseObject)
         {
-            return responseObject.Deserialize<CustomResponseDto>();
+            return System.Text.Json.JsonSerializer.Deserialize<CustomResponseDto>(responseObject.GetRawText());
         }
 
         private Dictionary<string, object> GetFields(TokenResponse response)
         {
-            return response.Json.Deserialize<Dictionary<string, object>>();
+            return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(response.Json.Value.GetRawText());
         }
 
         private Dictionary<string, object> GetPayload(TokenResponse response)

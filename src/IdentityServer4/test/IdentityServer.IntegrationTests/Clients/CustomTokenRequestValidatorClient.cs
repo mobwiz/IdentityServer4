@@ -124,7 +124,7 @@ namespace IdentityServer.IntegrationTests.Clients
         {
             //return response.Json.ToObject<Dictionary<string, object>>();
 
-            return response.Json.Deserialize<Dictionary<string, object>>();
+            return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(response.Json.Value.GetRawText());
         }
     }
 }

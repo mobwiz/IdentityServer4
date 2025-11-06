@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using System.Collections.Specialized;
 using IdentityServer4.Extensions;
 using IdentityServer4.Validation;
 
@@ -24,6 +25,7 @@ namespace IdentityServer4.ResponseHandling
 
         public string Error { get; set; }
         public string ErrorDescription { get; set; }
+        public NameValueCollection ExtendProperties { get; set; } = new NameValueCollection();
         public bool IsError => Error.IsPresent();
     }
 }
